@@ -1,0 +1,26 @@
+# Visual Studio build outputs
+obj/
+bin/*
+!bin/Release/
+bin/Release/*
+!bin/Release/MatchstickPuzzle.exe
+
+# User/local Visual Studio files
+.vs/
+*.user
+*.suo
+*.VC.db
+*.VC.opendb
+
+# Debug symbols and generated metadata
+*.pdb
+*.ilk
+*.idb
+*.iobj
+*.ipdb
+*.metagen
+
+# OS/editor noise
+Thumbs.db
+Desktop.ini
+.vscode/
