@@ -9,11 +9,6 @@ set "PATH="
 set "Path=%ORIGINAL_PATH%"
 set "ORIGINAL_PATH="
 
-if exist "bin\Release\MatchstickPuzzle.exe" (
-  start "" "bin\Release\MatchstickPuzzle.exe"
-  exit /b 0
-)
-
 set "MSBUILD="
 for /f "delims=" %%i in ('where.exe msbuild 2^>nul') do (
   set "MSBUILD=%%i"
@@ -29,6 +24,12 @@ for /f "delims=" %%i in ('"%VSWHERE%" -latest -products * -requires Microsoft.Co
 )
 
 :missing
+if exist "bin\Release\MatchstickPuzzle.exe" (
+  echo MSBuild was not found. Starting the existing game build.
+  start "" "bin\Release\MatchstickPuzzle.exe"
+  exit /b 0
+)
+
 echo MSBuild was not found. Install Visual Studio 2022 with:
 echo - Desktop development with C++
 echo - C++/CLI support
