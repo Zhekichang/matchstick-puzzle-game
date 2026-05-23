@@ -121,7 +121,6 @@ public:
         current = StateFromExpression(level->Start);
         selected = -1;
         Invalidate();
-        RaiseChanged();
     }
 
     bool IsSolved()
