@@ -38,8 +38,12 @@ pause
 exit /b 1
 
 :build
+set "TOOLSET_OVERRIDE="
+echo %MSBUILD% | findstr /I "\\18\\Community\\" >nul
+if not errorlevel 1 set "TOOLSET_OVERRIDE=/p:PlatformToolset=v145"
+
 echo Building the game with "%MSBUILD%"...
-"%MSBUILD%" MatchstickPuzzle.sln /p:Configuration=Release /p:Platform=x64 /m
+"%MSBUILD%" MatchstickPuzzle.sln /p:Configuration=Release /p:Platform=x64 %TOOLSET_OVERRIDE% /m
 if errorlevel 1 (
   echo Build failed.
   pause

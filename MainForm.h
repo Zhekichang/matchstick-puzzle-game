@@ -1,7 +1,6 @@
 #pragma once
 
 using namespace System;
-using namespace System::Collections::Generic;
 using namespace System::Drawing;
 using namespace System::Drawing::Drawing2D;
 using namespace System::Windows::Forms;
@@ -57,10 +56,11 @@ public:
 public ref class BoardControl : public Control
 {
 private:
-    List<SegmentSlot^>^ slots;
+    array<SegmentSlot^>^ slots;
     array<bool>^ current;
     array<bool>^ target;
     EventHandler^ boardChangedHandlers;
+    int slotCount;
     int selected;
 
 public:
@@ -81,9 +81,10 @@ public:
 
     BoardControl()
     {
-        slots = gcnew List<SegmentSlot^>();
+        slots = gcnew array<SegmentSlot^>(25);
         current = gcnew array<bool>(0);
         target = gcnew array<bool>(0);
+        slotCount = 0;
         selected = -1;
         DoubleBuffered = true;
         BackColor = Color::FromArgb(248, 249, 250);
@@ -158,11 +159,11 @@ protected:
         g->SmoothingMode = SmoothingMode::AntiAlias;
         g->Clear(BackColor);
 
-        if (slots->Count == 0) BuildSlots();
+        if (slotCount == 0) BuildSlots();
 
         DrawBoardBackplate(g);
 
-        for (int i = 0; i < slots->Count; ++i)
+        for (int i = 0; i < slotCount; ++i)
         {
             bool isActive = i < current->Length && current[i];
             bool isSelected = i == selected;
@@ -252,7 +253,7 @@ private:
 
     int HitTest(Point location)
     {
-        for (int i = 0; i < slots->Count; ++i)
+        for (int i = 0; i < slotCount; ++i)
             if (slots[i]->Bounds.Contains((float)location.X, (float)location.Y))
                 return i;
         return -1;
@@ -260,7 +261,7 @@ private:
 
     void BuildSlots()
     {
-        slots->Clear();
+        slotCount = 0;
         float totalWidth = 520.0f;
         float startX = (float)Math::Max(22.0, ((double)Width - totalWidth) / 2.0);
         float y = (float)Math::Max(36.0, ((double)Height - 190.0) / 2.0);
@@ -286,7 +287,8 @@ private:
         float right = Math::Max(a.X, b.X) + 14.0f;
         float bottom = Math::Max(a.Y, b.Y) + 14.0f;
         slot->Bounds = RectangleF(left, top, right - left, bottom - top);
-        slots->Add(slot);
+        slots[slotCount] = slot;
+        ++slotCount;
     }
 
     void AddDigitSlots(int position, float x, float y)
@@ -321,12 +323,12 @@ private:
 
     array<bool>^ StateFromExpression(String^ expression)
     {
-        array<bool>^ state = gcnew array<bool>(slots->Count);
-        for (int i = 0; i < expression->Length && i < 5; ++i)
+        array<bool>^ state = gcnew array<bool>(slotCount);
+        for (int i = 0; i < 5; ++i)
         {
             array<bool>^ mask = MaskFor(expression[i], i);
             int maskIndex = 0;
-            for (int s = 0; s < slots->Count; ++s)
+            for (int s = 0; s < slotCount; ++s)
             {
                 if (slots[s]->Position == i)
                 {
@@ -387,7 +389,7 @@ private:
             array<bool>^ mask = MaskFor(c, position);
             bool same = true;
             int maskIndex = 0;
-            for (int i = 0; i < slots->Count; ++i)
+            for (int i = 0; i < slotCount; ++i)
             {
                 if (slots[i]->Position != position) continue;
                 if (current[i] != mask[maskIndex]) same = false;
@@ -402,7 +404,7 @@ private:
     {
         bool horizontal = false;
         bool vertical = false;
-        for (int i = 0; i < slots->Count; ++i)
+        for (int i = 0; i < slotCount; ++i)
         {
             if (slots[i]->Position != position) continue;
             if (slots[i]->Segment == 0) horizontal = current[i];
@@ -417,7 +419,7 @@ private:
     {
         bool top = false;
         bool bottom = false;
-        for (int i = 0; i < slots->Count; ++i)
+        for (int i = 0; i < slotCount; ++i)
         {
             if (slots[i]->Position != position) continue;
             if (slots[i]->Segment == 0) top = current[i];
@@ -441,8 +443,8 @@ private:
     Button^ hintButton;
     Button^ nextButton;
     Timer^ gameTimer;
-    List<Level^>^ levels;
-    List<Level^>^ activeLevels;
+    array<Level^>^ levels;
+    array<Level^>^ activeLevels;
     Level^ currentLevel;
     GameMode mode;
     Difficulty difficulty;
@@ -589,34 +591,49 @@ private:
 
     void BuildLevels()
     {
-        levels = gcnew List<Level^>();
-        levels->Add(gcnew Level(L"Разминка", "6+4=4", "8-4=4", 1, Difficulty::Easy,
-            L"Снимите вертикальную спичку у плюса и добавьте ее к первой цифре."));
-        levels->Add(gcnew Level(L"Смена знака", "1+1=6", "7-1=6", 1, Difficulty::Easy,
-            L"Вертикальная спичка плюса может стать частью первой цифры."));
-        levels->Add(gcnew Level(L"Баланс", "2+2=5", "3+2=5", 1, Difficulty::Easy,
-            L"Достройте первую цифру, забрав лишнюю спичку из результата."));
-        levels->Add(gcnew Level(L"Двойной фокус", "1+1=9", "7-1=6", 2, Difficulty::Medium,
-            L"Сначала подумайте о знаке, затем о крайней правой цифре."));
-        levels->Add(gcnew Level(L"Точная сумма", "1+3=8", "7+2=9", 2, Difficulty::Medium,
-            L"Два переноса меняют каждую сторону равенства."));
-        levels->Add(gcnew Level(L"Переход через восемь", "1+4=6", "7+1=8", 2, Difficulty::Medium,
-            L"Нужно получить семерку слева и восьмерку справа."));
-        levels->Add(gcnew Level(L"Сложная перестройка", "1+1=8", "7-4=3", 3, Difficulty::Hard,
-            L"Три переноса меняют знак, среднюю цифру и результат."));
-        levels->Add(gcnew Level(L"Финальная логика", "1+2=7", "7-6=1", 3, Difficulty::Hard,
-            L"Ищите решение через минус: левая часть должна стать 7-6."));
+        levels = gcnew array<Level^>(8);
+        levels[0] = gcnew Level(L"Разминка", "6+4=4", "8-4=4", 1, Difficulty::Easy,
+            L"Снимите вертикальную спичку у плюса и добавьте ее к первой цифре.");
+        levels[1] = gcnew Level(L"Смена знака", "1+1=6", "7-1=6", 1, Difficulty::Easy,
+            L"Вертикальная спичка плюса может стать частью первой цифры.");
+        levels[2] = gcnew Level(L"Баланс", "2+2=5", "3+2=5", 1, Difficulty::Easy,
+            L"Достройте первую цифру, забрав лишнюю спичку из результата.");
+        levels[3] = gcnew Level(L"Двойной фокус", "1+1=9", "7-1=6", 2, Difficulty::Medium,
+            L"Сначала подумайте о знаке, затем о крайней правой цифре.");
+        levels[4] = gcnew Level(L"Точная сумма", "1+3=8", "7+2=9", 2, Difficulty::Medium,
+            L"Два переноса меняют каждую сторону равенства.");
+        levels[5] = gcnew Level(L"Переход через восемь", "1+4=6", "7+1=8", 2, Difficulty::Medium,
+            L"Нужно получить семерку слева и восьмерку справа.");
+        levels[6] = gcnew Level(L"Сложная перестройка", "1+1=8", "7-4=3", 3, Difficulty::Hard,
+            L"Три переноса меняют знак, среднюю цифру и результат.");
+        levels[7] = gcnew Level(L"Финальная логика", "1+2=7", "7-6=1", 3, Difficulty::Hard,
+            L"Ищите решение через минус: левая часть должна стать 7-6.");
     }
 
     void StartGame()
     {
-        activeLevels = gcnew List<Level^>();
+        int count = 0;
         for each (Level^ level in levels)
             if (level->Rank == difficulty || mode == GameMode::Free)
-                activeLevels->Add(level);
+                ++count;
 
-        if (activeLevels->Count == 0)
-            activeLevels->AddRange(levels);
+        if (count == 0)
+        {
+            activeLevels = levels;
+        }
+        else
+        {
+            activeLevels = gcnew array<Level^>(count);
+            int index = 0;
+            for each (Level^ level in levels)
+            {
+                if (level->Rank == difficulty || mode == GameMode::Free)
+                {
+                    activeLevels[index] = level;
+                    ++index;
+                }
+            }
+        }
 
         levelIndex = 0;
         score = 0;
@@ -627,7 +644,7 @@ private:
 
     void LoadCurrentLevel()
     {
-        currentLevel = activeLevels[levelIndex % activeLevels->Count];
+        currentLevel = activeLevels[levelIndex % activeLevels->Length];
         movesUsed = 0;
         board->Enabled = true;
         board->LoadLevel(currentLevel);
@@ -677,7 +694,7 @@ private:
 
     void NextLevel()
     {
-        levelIndex = (levelIndex + 1) % activeLevels->Count;
+        levelIndex = (levelIndex + 1) % activeLevels->Length;
         LoadCurrentLevel();
     }
 
