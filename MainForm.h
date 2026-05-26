@@ -235,7 +235,7 @@ private:
         StringFormat^ format = gcnew StringFormat();
         format->Alignment = StringAlignment::Center;
         RectangleF rect(0, (float)Height - 38.0f, (float)Width, 28.0f);
-        g->DrawString("Сейчас: " + text, font, brush, rect, format);
+        g->DrawString(L"Сейчас: " + text, font, brush, rect, format);
     }
 
     GraphicsPath^ RoundedRect(Rectangle rect, int radius)
@@ -454,7 +454,7 @@ private:
 public:
     MainForm()
     {
-        Text = "Головоломка со спичками";
+        Text = L"Головоломка со спичками";
         MinimumSize = System::Drawing::Size(820, 560);
         Size = System::Drawing::Size(980, 650);
         StartPosition = FormStartPosition::CenterScreen;
@@ -492,7 +492,7 @@ private:
         root->Controls->Add(header, 0, 0);
 
         titleLabel = gcnew Label();
-        titleLabel->Text = "Головоломка со спичками";
+        titleLabel->Text = L"Головоломка со спичками";
         titleLabel->AutoSize = true;
         titleLabel->Font = gcnew System::Drawing::Font("Segoe UI Semibold", 22.0f, FontStyle::Bold);
         titleLabel->ForeColor = Color::FromArgb(31, 41, 55);
@@ -519,7 +519,8 @@ private:
         modeBox = gcnew ComboBox();
         modeBox->DropDownStyle = ComboBoxStyle::DropDownList;
         modeBox->Width = 150;
-        modeBox->Items->AddRange(gcnew array<Object^>{"Кампания", "На время", "Свободно"});
+        modeBox->Items->AddRange(gcnew array<Object^>{
+            gcnew String(L"Кампания"), gcnew String(L"На время"), gcnew String(L"Свободно")});
         modeBox->SelectedIndex = 0;
         modeBox->SelectedIndexChanged += gcnew EventHandler(this, &MainForm::ModeChanged);
         tools->Controls->Add(modeBox);
@@ -527,20 +528,21 @@ private:
         difficultyBox = gcnew ComboBox();
         difficultyBox->DropDownStyle = ComboBoxStyle::DropDownList;
         difficultyBox->Width = 150;
-        difficultyBox->Items->AddRange(gcnew array<Object^>{"Легко", "Средне", "Сложно"});
+        difficultyBox->Items->AddRange(gcnew array<Object^>{
+            gcnew String(L"Легко"), gcnew String(L"Средне"), gcnew String(L"Сложно")});
         difficultyBox->SelectedIndex = 0;
         difficultyBox->SelectedIndexChanged += gcnew EventHandler(this, &MainForm::DifficultyChanged);
         tools->Controls->Add(difficultyBox);
 
-        resetButton = CreateButton("Сбросить");
+        resetButton = CreateButton(L"Сбросить");
         resetButton->Click += gcnew EventHandler(this, &MainForm::ResetClicked);
         tools->Controls->Add(resetButton);
 
-        hintButton = CreateButton("Подсказка");
+        hintButton = CreateButton(L"Подсказка");
         hintButton->Click += gcnew EventHandler(this, &MainForm::HintClicked);
         tools->Controls->Add(hintButton);
 
-        nextButton = CreateButton("Следующий");
+        nextButton = CreateButton(L"Следующий");
         nextButton->Click += gcnew EventHandler(this, &MainForm::NextClicked);
         tools->Controls->Add(nextButton);
 
@@ -588,22 +590,22 @@ private:
     void BuildLevels()
     {
         levels = gcnew List<Level^>();
-        levels->Add(gcnew Level("Разминка", "6+4=4", "8-4=4", 1, Difficulty::Easy,
-            "Снимите вертикальную спичку у плюса и добавьте ее к первой цифре."));
-        levels->Add(gcnew Level("Смена знака", "1+1=6", "7-1=6", 1, Difficulty::Easy,
-            "Вертикальная спичка плюса может стать частью первой цифры."));
-        levels->Add(gcnew Level("Баланс", "2+2=5", "3+2=5", 1, Difficulty::Easy,
-            "Достройте первую цифру, забрав лишнюю спичку из результата."));
-        levels->Add(gcnew Level("Двойной фокус", "1+1=9", "7-1=6", 2, Difficulty::Medium,
-            "Сначала подумайте о знаке, затем о крайней правой цифре."));
-        levels->Add(gcnew Level("Точная сумма", "1+3=8", "7+2=9", 2, Difficulty::Medium,
-            "Два переноса меняют каждую сторону равенства."));
-        levels->Add(gcnew Level("Переход через восемь", "1+4=6", "7+1=8", 2, Difficulty::Medium,
-            "Нужно получить семерку слева и восьмерку справа."));
-        levels->Add(gcnew Level("Сложная перестройка", "1+1=8", "7-4=3", 3, Difficulty::Hard,
-            "Три переноса меняют знак, среднюю цифру и результат."));
-        levels->Add(gcnew Level("Финальная логика", "1+2=7", "7-6=1", 3, Difficulty::Hard,
-            "Ищите решение через минус: левая часть должна стать 7-6."));
+        levels->Add(gcnew Level(L"Разминка", "6+4=4", "8-4=4", 1, Difficulty::Easy,
+            L"Снимите вертикальную спичку у плюса и добавьте ее к первой цифре."));
+        levels->Add(gcnew Level(L"Смена знака", "1+1=6", "7-1=6", 1, Difficulty::Easy,
+            L"Вертикальная спичка плюса может стать частью первой цифры."));
+        levels->Add(gcnew Level(L"Баланс", "2+2=5", "3+2=5", 1, Difficulty::Easy,
+            L"Достройте первую цифру, забрав лишнюю спичку из результата."));
+        levels->Add(gcnew Level(L"Двойной фокус", "1+1=9", "7-1=6", 2, Difficulty::Medium,
+            L"Сначала подумайте о знаке, затем о крайней правой цифре."));
+        levels->Add(gcnew Level(L"Точная сумма", "1+3=8", "7+2=9", 2, Difficulty::Medium,
+            L"Два переноса меняют каждую сторону равенства."));
+        levels->Add(gcnew Level(L"Переход через восемь", "1+4=6", "7+1=8", 2, Difficulty::Medium,
+            L"Нужно получить семерку слева и восьмерку справа."));
+        levels->Add(gcnew Level(L"Сложная перестройка", "1+1=8", "7-4=3", 3, Difficulty::Hard,
+            L"Три переноса меняют знак, среднюю цифру и результат."));
+        levels->Add(gcnew Level(L"Финальная логика", "1+2=7", "7-6=1", 3, Difficulty::Hard,
+            L"Ищите решение через минус: левая часть должна стать 7-6."));
     }
 
     void StartGame()
@@ -629,7 +631,7 @@ private:
         movesUsed = 0;
         board->Enabled = true;
         board->LoadLevel(currentLevel);
-        UpdateLabels("Выберите спичку, затем пустое место для переноса.");
+        UpdateLabels(L"Выберите спичку, затем пустое место для переноса.");
     }
 
     void UpdateLabels(String^ status)
@@ -637,12 +639,12 @@ private:
         String^ rank = difficultyBox->SelectedItem == nullptr ? "" : difficultyBox->SelectedItem->ToString();
         String^ modeName = modeBox->SelectedItem == nullptr ? "" : modeBox->SelectedItem->ToString();
         int limit = MoveLimit();
-        infoLabel->Text = String::Format("{0}: {1}   |   Цель: {2}   |   Ходы: {3}/{4}   |   Режим: {5}, {6}",
+        infoLabel->Text = String::Format(L"{0}: {1}   |   Цель: {2}   |   Ходы: {3}/{4}   |   Режим: {5}, {6}",
             currentLevel->Title, currentLevel->Start, currentLevel->Target, movesUsed, limit, modeName, rank);
         statusLabel->Text = status;
         timerLabel->Text = mode == GameMode::Timed
-            ? String::Format("Время: {0}:{1:00}   Очки: {2}", secondsLeft / 60, secondsLeft % 60, score)
-            : String::Format("Очки: {0}", score);
+            ? String::Format(L"Время: {0}:{1:00}   Очки: {2}", secondsLeft / 60, secondsLeft % 60, score)
+            : String::Format(L"Очки: {0}", score);
     }
 
     int MoveLimit()
@@ -657,20 +659,20 @@ private:
         if (board->IsSolved())
         {
             score += Math::Max(10, 60 - movesUsed * 8);
-            UpdateLabels("Уровень решен. Отлично.");
-            MessageBox::Show("Решено! Переходим дальше.", "Победа", MessageBoxButtons::OK, MessageBoxIcon::Information);
+            UpdateLabels(L"Уровень решен. Отлично.");
+            MessageBox::Show(L"Решено! Переходим дальше.", L"Победа", MessageBoxButtons::OK, MessageBoxIcon::Information);
             NextLevel();
             return;
         }
 
         if (movesUsed >= MoveLimit())
         {
-            UpdateLabels("Лимит ходов исчерпан. Можно сбросить уровень или открыть подсказку.");
+            UpdateLabels(L"Лимит ходов исчерпан. Можно сбросить уровень или открыть подсказку.");
             board->Enabled = false;
             return;
         }
 
-        UpdateLabels("Ход принят. Продолжайте искать верное равенство.");
+        UpdateLabels(L"Ход принят. Продолжайте искать верное равенство.");
     }
 
     void NextLevel()
@@ -702,12 +704,12 @@ private:
         movesUsed = 0;
         board->Enabled = true;
         board->ResetState(currentLevel);
-        UpdateLabels("Уровень сброшен.");
+        UpdateLabels(L"Уровень сброшен.");
     }
 
     void HintClicked(Object^, EventArgs^)
     {
-        MessageBox::Show(currentLevel->Hint, "Подсказка", MessageBoxButtons::OK, MessageBoxIcon::Information);
+        MessageBox::Show(currentLevel->Hint, L"Подсказка", MessageBoxButtons::OK, MessageBoxIcon::Information);
     }
 
     void NextClicked(Object^, EventArgs^)
@@ -725,7 +727,7 @@ private:
         }
 
         gameTimer->Stop();
-        MessageBox::Show(String::Format("Время вышло. Ваш счет: {0}", score), "Игра окончена",
+        MessageBox::Show(String::Format(L"Время вышло. Ваш счет: {0}", score), L"Игра окончена",
             MessageBoxButtons::OK, MessageBoxIcon::Information);
         StartGame();
     }
